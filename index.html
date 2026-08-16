@@ -708,6 +708,8 @@ input::placeholder{color:#57647a;}
   gap:12px;
 }
 .ticket-nums{display:flex;gap:18px;flex-wrap:wrap;}
+.num-value.bonus-val{color:var(--amber);}
+.icon-btn.bonus.on{border-color:var(--amber);background:var(--amber-soft);}
 .num-block .num-label{font-size:0.66rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
 .num-block .num-value{font-family:var(--font-mono);font-weight:700;font-size:0.95rem;}
 
@@ -984,6 +986,11 @@ footer{
         </div>
         <input type="number" id="oddsInput" placeholder="-110" step="1">
       </div>
+    </div>
+
+    <div class="field">
+      <label for="bonusInput">Bono ($) — opcional</label>
+      <input type="number" id="bonusInput" placeholder="Se llena solo si la captura lo muestra" min="0" step="0.01">
     </div>
 
     <div class="return-preview">
@@ -1429,6 +1436,9 @@ async function addBet(){
     createdAt: Date.now()
   };
 
+  const bonoForm = parseFloat(el('bonusInput').value);
+  if(!isNaN(bonoForm) && bonoForm > 0) bet.bonus = bonoForm;
+
   if(casino && !casinoOptions().some(c => c.toLowerCase() === casino.toLowerCase())){
     customCasinos.push(casino);
     await saveCasinos();
@@ -1451,6 +1461,7 @@ function resetForm(){
   el('tipsterInput').value = '';
   el('stakeInput').value = '';
   el('oddsInput').value = '';
+  el('bonusInput').value = '';
   resetEventRows();
   resetDescRows();
   el('formStatus').textContent = '';
@@ -1492,6 +1503,45 @@ function setAllCollapsed(state){
   const resolved = bets.filter(b => b.status !== 'pendiente');
   resolved.forEach(b => { collapsedBets[b.id] = state; });
   renderHistory();
+}
+
+let bonusBetId = null;
+
+function openBonusForm(id){
+  bonusBetId = id;
+  closingBetId = null;
+  renderAll();
+  const inp = el('bonusInput_' + id);
+  if(inp){
+    const b = bets.find(x => x.id === id);
+    if(b && b.bonus) inp.value = b.bonus;
+    inp.focus();
+  }
+}
+
+function cancelBonus(){
+  bonusBetId = null;
+  renderAll();
+}
+
+async function confirmBonus(id){
+  const inp = el('bonusInput_' + id);
+  const val = inp ? parseFloat(inp.value) : NaN;
+  const b = bets.find(x => x.id === id);
+  if(!b) return;
+  if(inp && inp.value.trim() === ''){
+    delete b.bonus;
+  } else if(isNaN(val) || val < 0){
+    if(inp) inp.style.borderColor = 'var(--red)';
+    return;
+  } else if(val === 0){
+    delete b.bonus;
+  } else {
+    b.bonus = val;
+  }
+  bonusBetId = null;
+  await saveBets();
+  renderAll();
 }
 
 let closingBetId = null;
@@ -1545,9 +1595,11 @@ function renderScoreboard(){
   const won = bets.filter(b => b.status === 'ganada');
   const lost = bets.filter(b => b.status === 'perdida');
   const closed = bets.filter(b => b.status === 'cerrada');
+  const totalBonus = bets.reduce((s,b) => s + (b.bonus || 0), 0);
   const netProfit = won.reduce((s,b) => s + computeProfit(b.stake, b.odds, b.oddsFormat || 'decimal'), 0)
     - lost.reduce((s,b) => s + b.stake, 0)
-    + closed.reduce((s,b) => s + (b.closeAmount - b.stake), 0);
+    + closed.reduce((s,b) => s + (b.closeAmount - b.stake), 0)
+    + totalBonus;
   const resolvedCount = won.length + lost.length;
   const winRate = resolvedCount > 0 ? Math.round((won.length / resolvedCount) * 100) + '%' : '—';
 
@@ -1602,6 +1654,7 @@ function renderChart(){
     if(b.status === 'ganada') delta = computeProfit(b.stake, b.odds, format);
     else if(b.status === 'perdida') delta = -b.stake;
     else delta = b.closeAmount - b.stake;
+    delta += (b.bonus || 0);
     values.push(values[values.length - 1] + delta);
   });
 
@@ -1671,13 +1724,21 @@ function ticketCardHTML(b, collapsible){
       '<input type="number" class="close-input" id="closeInput_' + b.id + '" placeholder="Monto recibido" step="0.01" min="0">' +
       '<button class="icon-btn win" onclick="confirmClose(\'' + b.id + '\')" title="Confirmar cierre">✓</button>' +
       '<button class="icon-btn" onclick="cancelClose()" title="Cancelar">✕</button>';
+  } else if(bonusBetId === b.id){
+    actions =
+      '<input type="number" class="close-input" id="bonusInput_' + b.id + '" placeholder="Monto del bono" step="0.01" min="0">' +
+      '<button class="icon-btn win" onclick="confirmBonus(\'' + b.id + '\')" title="Guardar bono">✓</button>' +
+      '<button class="icon-btn" onclick="cancelBonus()" title="Cancelar">✕</button>';
   } else if(b.status === 'pendiente'){
     actions =
       '<button class="icon-btn win" onclick="setStatus(\'' + b.id + '\',\'ganada\')" title="Marcar como ganada">✓</button>' +
       '<button class="icon-btn lose" onclick="setStatus(\'' + b.id + '\',\'perdida\')" title="Marcar como perdida">✕</button>' +
-      '<button class="icon-btn close" onclick="openCloseForm(\'' + b.id + '\')" title="Cerrar apuesta anticipadamente">🔒</button>';
+      '<button class="icon-btn close" onclick="openCloseForm(\'' + b.id + '\')" title="Cerrar apuesta anticipadamente">🔒</button>' +
+      '<button class="icon-btn bonus' + (b.bonus ? ' on' : '') + '" onclick="openBonusForm(\'' + b.id + '\')" title="Sumar un bono a este ticket">🎁</button>';
   } else {
-    actions = '<button class="icon-btn" onclick="setStatus(\'' + b.id + '\',\'pendiente\')" title="Reabrir">↺</button>';
+    actions =
+      '<button class="icon-btn bonus' + (b.bonus ? ' on' : '') + '" onclick="openBonusForm(\'' + b.id + '\')" title="Sumar un bono a este ticket">🎁</button>' +
+      '<button class="icon-btn" onclick="setStatus(\'' + b.id + '\',\'pendiente\')" title="Reabrir">↺</button>';
   }
 
   const legs = betLegs(b);
@@ -1754,6 +1815,7 @@ function ticketCardHTML(b, collapsible){
         '<div class="num-block"><div class="num-label">Cantidad</div><div class="num-value">' + formatMoney(b.stake) + '</div></div>' +
         '<div class="num-block"><div class="num-label">Momio (' + (format === 'decimal' ? 'Dec' : 'Am') + ')</div><div class="num-value">' + formatOdds(b.odds, format) + '</div></div>' +
         '<div class="num-block"><div class="num-label">' + (b.status === 'ganada' ? 'Ganancia' : 'Retorno potencial') + '</div><div class="num-value">' + formatMoney(b.status === 'ganada' ? profit : ret) + '</div></div>') +
+        (b.bonus ? '<div class="num-block"><div class="num-label">Bono</div><div class="num-value bonus-val">+' + formatMoney(b.bonus) + '</div></div>' : '') +
         legsSummary +
       '</div>' +
       '<div class="ticket-actions">' +
@@ -1924,7 +1986,7 @@ async function fileToScaledImage(file){
 const SCAN_PROMPT = [
   'Esta es la captura de un ticket de apuestas deportivas.',
   'Devuelve SOLO un objeto JSON, sin explicaciones y sin backticks, con esta forma exacta:',
-  '{"casino":"","tipster":"","stake":null,"odds":null,"oddsFormat":"american","events":[{"event":"","selections":[""]}]}',
+  '{"casino":"","tipster":"","stake":null,"odds":null,"oddsFormat":"american","bonus":null,"events":[{"event":"","selections":[""]}]}',
   '',
   'Reglas:',
   '- "events": un objeto por cada partido o evento del ticket. "event" es el enfrentamiento (ej. "Real Madrid vs Barcelona") y "selections" son las selecciones apostadas de ese evento (ej. "Gana Real Madrid", "Mas de 2.5 goles").',
@@ -1934,6 +1996,7 @@ const SCAN_PROMPT = [
   '- "odds": el momio total del ticket como numero. Si viene como +150 o -110 usa "american"; si viene como 1.85 o 2.40 usa "decimal".',
   '- "casino": el nombre de la casa de apuestas si se ve en la imagen (Winpot, Draftea, Caliente, Bet365, etc.), si no, cadena vacia.',
   '- "tipster": cadena vacia salvo que la imagen indique claramente quien dio el pronostico.',
+  '- "bonus": si el ticket muestra un bono, impulso, boost o ganancia extra aparte del retorno normal, pon solo ese numero. Si no aparece ninguno, usa null. No confundas la ganancia total con un bono.',
   '- Si un dato no aparece, usa null para los numeros y "" para los textos.'
 ].join('\n');
 
@@ -2042,13 +2105,17 @@ function applyScan(data){
   }
   if(data.tipster) el('tipsterInput').value = String(data.tipster).trim();
 
+  const bono = typeof data.bonus === 'string' ? parseFloat(data.bonus.replace(/[^0-9.]/g, '')) : data.bonus;
+  if(typeof bono === 'number' && !isNaN(bono) && bono > 0) el('bonusInput').value = bono;
+
   updatePreview();
   const faltan = [];
   if(!el('stakeInput').value) faltan.push('la cantidad');
   if(!el('oddsInput').value) faltan.push('el momio');
+  const avisoBono = el('bonusInput').value ? ' Bono detectado: ' + formatMoney(parseFloat(el('bonusInput').value)) + '.' : '';
   setScanStatus(faltan.length
-    ? 'Listo, pero no alcancé a leer ' + faltan.join(' ni ') + '. Completa y revisa antes de registrar.'
-    : 'Campos completados. Revísalos y presiona Registrar apuesta.', faltan.length ? 'working' : 'ok');
+    ? 'Listo, pero no alcancé a leer ' + faltan.join(' ni ') + '. Completa y revisa antes de registrar.' + avisoBono
+    : 'Campos completados.' + avisoBono + ' Revísalos y presiona Registrar apuesta.', faltan.length ? 'working' : 'ok');
 }
 
 function clearScan(){
