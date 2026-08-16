@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARCADOR · Tu registro de apuestas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
+:root{
+  --bg:#0B1220;
+  --surface:#141D2E;
+  --surface-2:#1B2740;
+  --line:#263248;
+  --green:#22935B;
+  --green-soft:rgba(34,147,91,0.16);
+  --amber:#FFB627;
+  --amber-soft:rgba(255,182,39,0.14);
+  --red:#E5484D;
+  --red-soft:rgba(229,72,77,0.14);
+  --blue:#4EA8DE;
+  --blue-soft:rgba(78,168,222,0.16);
+  --text:#F4F6F5;
+  --text-muted:#8A95A6;
+  --font-display:'Anton', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'Space Mono', monospace;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+
+body{
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(34,147,91,0.16), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 0%, rgba(255,182,39,0.10), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  min-height:100vh;
+  padding:32px 20px 80px;
+  position:relative;
+}
+
+.stadium-bg{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+  pointer-events:none;
+}
+.stadium-bg svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.wrap{max-width:920px;margin:0 auto;position:relative;z-index:1;}
+
+/* ---------- Header ---------- */
+.header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:28px;
+  flex-wrap:wrap;
+  border-bottom:1px solid var(--line);
+  padding:16px 18px 20px;
+  background:linear-gradient(180deg, rgba(5,9,16,0.6), rgba(5,9,16,0.1));
+  border-radius:14px 14px 0 0;
+}
+.brand{display:flex;align-items:baseline;gap:12px;}
+.brand h1{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:clamp(2rem,6vw,2.8rem);
+  letter-spacing:0.5px;
+  margin:0;
+  background:linear-gradient(180deg,#ffffff, #c9d4e0);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(34,147,91,0.9);}
+.tagline{color:var(--text-muted);font-size:0.92rem;margin:0;}
+
+/* ---------- Bank hero ---------- */
+.bank-hero{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:14px;
+  text-align:center;
+}
+.bank-label{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:8px;
+}
+.bank-value{
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:clamp(2rem,7vw,3rem);
+  color:var(--amber);
+  text-shadow:0 0 12px rgba(255,182,39,0.55), 0 0 28px rgba(255,182,39,0.2);
+  margin-bottom:10px;
+}
+.bank-value.positive{color:var(--green);text-shadow:0 0 12px rgba(34,147,91,0.6), 0 0 28px rgba(34,147,91,0.25);}
+.bank-value.negative{color:var(--red);text-shadow:0 0 12px rgba(229,72,77,0.55), 0 0 28px rgba(229,72,77,0.2);}
+.bank-hint{font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;}
+.bank-edit-btn{
+  background:transparent;
+  border:none;
+  color:var(--text-muted);
+  font-size:0.8rem;
+  font-family:var(--font-body);
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.bank-edit-btn:hover{color:var(--text);}
+.bank-btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.bank-edit-btn.withdraw{border-color:rgba(240,176,64,0.45);color:var(--amber);}
+.bank-edit-btn.withdraw:hover{background:rgba(240,176,64,0.12);color:var(--amber);}
+.bank-edit-form button.ghost{background:transparent;border:1px solid var(--border);color:var(--text-muted);}
+.bank-withdrawn{
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  color:var(--amber);
+  margin-bottom:8px;
+  letter-spacing:0.5px;
+}
+.bank-status{font-size:0.78rem;color:var(--red);margin-top:8px;min-height:1em;}
+.bank-status.ok{color:var(--green);}
+.withdraw-log{
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:center;
+}
+.withdraw-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  color:var(--text-muted);
+  background:rgba(0,0,0,0.2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:5px 10px;
+}
+.withdraw-item .amount{color:var(--amber);font-weight:700;}
+.withdraw-item button{
+  background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.9rem;line-height:1;padding:0 2px;
+}
+.withdraw-item button:hover{color:var(--red);}
+.bank-edit-form{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+.bank-edit-form input{width:180px;}
+.bank-edit-form button{
+  background:var(--green);
+  color:#08150E;
+  border:none;
+  border-radius:8px;
+  padding:0 18px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:var(--font-body);
+  font-size:0.9rem;
+}
+
+/* ---------- Scoreboard (signature element) ---------- */
+.scoreboard{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:32px;
+}
+.stat{
+  background:var(--surface);
+  padding:18px 14px;
+  text-align:center;
+}
+.stat-label{
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:8px;
+}
+.stat-value{
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:clamp(1.15rem,4vw,1.65rem);
+  color:var(--amber);
+  text-shadow:0 0 10px rgba(255,182,39,0.55), 0 0 24px rgba(255,182,39,0.2);
+}
+.stat-value.negative{color:var(--red);text-shadow:0 0 10px rgba(229,72,77,0.55), 0 0 24px rgba(229,72,77,0.2);}
+.stat-value.positive{color:var(--green);text-shadow:0 0 10px rgba(34,147,91,0.6), 0 0 24px rgba(34,147,91,0.25);}
+
+@media (max-width:640px){
+  .scoreboard{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ---------- Panels ---------- */
+.panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:28px;
+}
+.panel-title{
+  font-family:var(--font-display);
+  font-weight:400;
+  font-size:1.15rem;
+  letter-spacing:0.5px;
+  margin:0 0 18px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.panel-title .bar{width:4px;height:18px;background:var(--green);border-radius:2px;display:inline-block;}
+
+label{
+  display:block;
+  font-size:0.78rem;
+  color:var(--text-muted);
+  margin-bottom:6px;
+  font-weight:600;
+  letter-spacing:0.2px;
+}
+
+input[type=text], input[type=number], select{
+  width:100%;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:11px 12px;
+  border-radius:8px;
+  font-family:var(--font-body);
+  font-size:0.95rem;
+  outline:none;
+  transition:border-color .15s ease;
+}
+input:focus, select:focus{border-color:var(--green);}
+input::placeholder{color:#57647a;}
+
+.field{margin-bottom:16px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+
+.odds-toggle{display:flex;gap:6px;margin-bottom:8px;}
+.toggle-btn{
+  flex:1;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  padding:7px 10px;
+  border-radius:7px;
+  font-size:0.78rem;
+  font-family:var(--font-body);
+  font-weight:600;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.toggle-btn.active{background:var(--green-soft);border-color:var(--green);color:var(--text);}
+
+.desc-list{display:flex;flex-direction:column;gap:10px;}
+.desc-row{display:flex;gap:10px;align-items:center;}
+.desc-row .desc-input, .desc-row .event-input{flex:1;}
+.desc-add-btn.event{background:var(--amber);color:#1A1200;}
+.desc-add-btn{
+  background:var(--green);
+  color:#08150E;
+  border:none;
+  border-radius:8px;
+  padding:0 16px;
+  height:42px;
+  font-family:var(--font-body);
+  font-weight:700;
+  font-size:0.85rem;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  transition:filter .15s ease;
+}
+.desc-add-btn:hover{filter:brightness(1.08);}
+.desc-remove-btn{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  border-radius:8px;
+  width:42px;
+  height:42px;
+  font-size:1.1rem;
+  cursor:pointer;
+  flex-shrink:0;
+  transition:all .15s ease;
+}
+.desc-remove-btn:hover{border-color:var(--red);color:var(--red);}
+
+
+.desc-group{margin-bottom:16px;}
+.desc-group:last-child{margin-bottom:0;}
+.desc-group-title{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--amber);
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.desc-group-title::before{
+  content:'';
+  width:3px;
+  height:13px;
+  background:var(--amber);
+  border-radius:2px;
+  flex-shrink:0;
+}
+
+@media (max-width:560px){
+  .field-row, .field-row-3{grid-template-columns:1fr;}
+}
+
+/* ---------- Preview return ---------- */
+.return-preview{
+  background:var(--green-soft);
+  border:1px solid rgba(34,147,91,0.35);
+  border-radius:10px;
+  padding:14px 16px;
+  margin-bottom:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.return-preview .lab{font-size:0.8rem;color:var(--text-muted);}
+.return-preview .val{font-family:var(--font-mono);font-weight:700;font-size:1.25rem;color:var(--green);}
+.return-preview .profit{font-family:var(--font-mono);font-size:0.85rem;color:var(--text-muted);}
+
+.btn-primary{
+  width:100%;
+  background:var(--green);
+  color:#08150E;
+  border:none;
+  border-radius:9px;
+  padding:14px;
+  font-family:var(--font-body);
+  font-weight:700;
+  font-size:0.95rem;
+  cursor:pointer;
+  transition:filter .15s ease;
+}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-primary:active{filter:brightness(0.95);}
+
+/* ---------- History ---------- */
+.history-head{display:flex;justify-content:flex-start;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+.back-btn{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:8px 14px;
+  border-radius:8px;
+  font-family:var(--font-body);
+  font-size:0.85rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .15s ease;
+  flex-shrink:0;
+}
+.back-btn:hover{border-color:var(--green);background:var(--green-soft);}
+
+.history-cta-text{color:var(--text-muted);font-size:0.88rem;margin:0 0 16px;}
+
+/* ---------- Chart ---------- */
+.chart-empty{
+  text-align:center;
+  padding:30px 20px;
+  color:var(--text-muted);
+  font-size:0.88rem;
+}
+#chartContainer svg{width:100%;height:auto;display:block;}
+.filters{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-btn{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  padding:6px 13px;
+  border-radius:20px;
+  font-size:0.78rem;
+  cursor:pointer;
+  font-family:var(--font-body);
+  transition:all .15s ease;
+}
+.filter-btn.active{background:var(--green-soft);border-color:var(--green);color:var(--text);}
+
+.date-filter-row{display:flex;gap:8px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+.date-filter-row input[type=date]{width:auto;flex:1;min-width:150px;}
+.date-filter-row .filter-btn{flex-shrink:0;}
+
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--text-muted);
+  font-size:0.92rem;
+}
+.empty-state .big{font-size:2rem;margin-bottom:10px;}
+
+.ticket{
+  position:relative;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:16px 18px;
+  margin-bottom:12px;
+  border-left:3px solid var(--line);
+}
+.ticket.status-ganada{border-left-color:var(--green);}
+.ticket.status-perdida{border-left-color:var(--red);}
+.ticket.status-pendiente{border-left-color:var(--amber);}
+.ticket.status-cerrada{border-left-color:var(--blue);}
+
+.ticket-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+.ticket-match{display:flex;align-items:center;gap:10px;}
+.ticket-legs{display:flex;flex-direction:column;gap:10px;margin-bottom:10px;}
+.ticket-leg{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+.ticket-leg .leg-info{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  flex-wrap:wrap;
+  flex:1;
+  min-width:0;
+}
+.ticket-leg .tags{justify-content:flex-end;}
+.leg-actions{display:flex;gap:4px;flex-shrink:0;}
+.leg-btn{padding:3px 8px;font-size:0.78rem;}
+.leg-btn.win.on{border-color:var(--green);color:var(--green);background:var(--green-soft);}
+.leg-btn.lose.on{border-color:var(--red);color:var(--red);background:var(--red-soft);}
+.leg-mark-icon{font-weight:700;margin-right:5px;}
+.leg-mark-icon.win{color:var(--green);}
+.leg-mark-icon.lose{color:var(--red);}
+.ticket-leg.leg-ganada .ticket-match-name{color:var(--green);}
+.ticket-leg.leg-perdida .ticket-match-name{color:var(--red);text-decoration:line-through;text-decoration-thickness:1px;}
+.ticket-leg.leg-perdida .tags{opacity:0.55;}
+.leg-count .won{color:var(--green);}
+.leg-count .lost{color:var(--red);}
+.leg-count .pend{color:var(--text-muted);}
+.ticket-match-name{font-weight:700;font-size:0.95rem;line-height:1.45;}
+.scan-box{margin-bottom:20px;}
+.scan-drop{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:16px;
+  border:1px dashed var(--line);
+  border-radius:10px;
+  background:var(--surface-2);
+  cursor:pointer;
+  transition:border-color .15s ease, background .15s ease;
+}
+.scan-drop:hover, .scan-drop.dragover{border-color:var(--amber);background:rgba(255,182,39,0.06);}
+.scan-icon{font-size:1.5rem;line-height:1;}
+.scan-text{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.scan-text b{font-size:0.92rem;color:var(--text);}
+.scan-text span{font-size:0.8rem;color:var(--text-muted);}
+.scan-result{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface-2);
+}
+.scan-result img{
+  width:84px;
+  height:84px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid var(--line);
+  flex-shrink:0;
+}
+.scan-info{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1;}
+.scan-status{font-size:0.84rem;color:var(--text-muted);line-height:1.5;}
+.scan-status.ok{color:var(--green);}
+.scan-status.err{color:var(--red);}
+.scan-status.working{color:var(--amber);}
+.scan-clear{
+  align-self:flex-start;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  border-radius:6px;
+  padding:4px 10px;
+  font-size:0.75rem;
+  font-family:var(--font-mono);
+  cursor:pointer;
+}
+.scan-clear:hover{color:var(--text);border-color:var(--text-muted);}
+.backup-row{display:flex;gap:10px;flex-wrap:wrap;}
+.drive-box{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px dashed var(--line);
+}
+.drive-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.drive-title{
+  font-family:var(--font-mono);
+  font-size:0.75rem;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.drive-dot{width:8px;height:8px;border-radius:50%;background:var(--text-muted);opacity:0.5;}
+.drive-dot.on{background:var(--green);opacity:1;box-shadow:0 0 8px rgba(34,197,94,0.5);}
+.drive-setup{
+  font-size:0.8rem;
+  color:var(--text-muted);
+  line-height:1.6;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:12px;
+  margin-bottom:12px;
+}
+.drive-setup code{color:var(--amber);font-family:var(--font-mono);font-size:0.78rem;}
+.drive-setup b{color:var(--text);}
+.btn-secondary{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:11px 16px;
+  border-radius:8px;
+  font-family:var(--font-body);
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:border-color .15s ease, color .15s ease;
+  flex:1;
+  min-width:170px;
+}
+.btn-secondary:hover{border-color:var(--amber);color:var(--amber);}
+.backup-status{font-size:0.82rem;margin-top:12px;color:var(--text-muted);min-height:1em;}
+.backup-status.ok{color:var(--green);}
+.backup-status.err{color:var(--red);}
+.backup-text{
+  width:100%;
+  height:120px;
+  margin-top:12px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:8px;
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  padding:10px;
+  resize:vertical;
+}
+.ticket-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom:1px dashed var(--line);
+}
+.bet-title{
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  font-weight:700;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  padding:4px 10px;
+  border-radius:5px;
+  border:1px solid var(--line);
+  color:var(--text-muted);
+}
+.bet-title.t-parlay{color:var(--amber);border-color:rgba(240,176,64,0.45);background:rgba(240,176,64,0.08);}
+.bet-title.t-crear{color:var(--blue);border-color:rgba(76,140,232,0.45);background:rgba(76,140,232,0.08);}
+.bet-title.t-derecha{color:var(--green);border-color:rgba(34,147,91,0.45);background:rgba(34,147,91,0.08);}
+.collapse-btn{
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  border-radius:6px;
+  padding:4px 10px;
+  font-size:0.74rem;
+  font-family:var(--font-mono);
+  letter-spacing:0.5px;
+  cursor:pointer;
+  transition:color .15s ease, border-color .15s ease;
+  flex-shrink:0;
+}
+.collapse-btn:hover{color:var(--text);border-color:var(--text-muted);}
+.ticket.collapsed{padding-bottom:14px;}
+.ticket.collapsed .ticket-head{margin-bottom:8px;padding-bottom:8px;}
+.ticket-peek{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  font-size:0.85rem;
+}
+.peek-name{
+  color:var(--text);
+  font-weight:600;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:100%;
+}
+.peek-nums{
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  color:var(--text-muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+.ticket-date{font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px;}
+.ticket-meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+.meta-chip{
+  font-family:var(--font-mono);
+  font-size:0.7rem;
+  letter-spacing:0.5px;
+  padding:3px 8px;
+  border-radius:5px;
+  border:1px solid var(--border);
+  background:rgba(0,0,0,0.22);
+  color:var(--text-muted);
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+.meta-chip.casino{color:var(--amber);border-color:rgba(240,176,64,0.35);}
+.meta-chip.tipster{color:var(--text);}
+.extra-input{margin-top:8px;}
+.form-status{text-align:center;font-size:0.8rem;color:var(--text-muted);margin:8px 0 4px;font-family:var(--font-mono);}
+
+.tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{
+  font-size:0.68rem;
+  font-family:var(--font-mono);
+  padding:3px 9px;
+  border-radius:12px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  white-space:nowrap;
+}
+
+.ticket-divider{
+  border-top:1px dashed var(--line);
+  margin:12px 0;
+}
+
+.ticket-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.ticket-nums{display:flex;gap:18px;flex-wrap:wrap;}
+.num-block .num-label{font-size:0.66rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
+.num-block .num-value{font-family:var(--font-mono);font-weight:700;font-size:0.95rem;}
+
+.status-badge{
+  font-size:0.72rem;
+  font-weight:700;
+  padding:5px 12px;
+  border-radius:20px;
+  font-family:var(--font-mono);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+.status-badge.pendiente{background:var(--amber-soft);color:var(--amber);}
+.status-badge.ganada{background:var(--green-soft);color:var(--green);}
+.status-badge.perdida{background:var(--red-soft);color:var(--red);}
+.status-badge.cerrada{background:var(--blue-soft);color:var(--blue);}
+
+.ticket-actions{display:flex;gap:6px;align-items:center;}
+.icon-btn{
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  border-radius:7px;
+  padding:6px 9px;
+  cursor:pointer;
+  font-size:0.85rem;
+  transition:all .15s ease;
+  line-height:1;
+}
+.icon-btn:hover{border-color:var(--text-muted);color:var(--text);}
+.icon-btn.win:hover{border-color:var(--green);color:var(--green);}
+.icon-btn.close:hover{border-color:var(--blue);color:var(--blue);}
+
+.close-input{
+  width:120px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:6px 8px;
+  border-radius:7px;
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+  outline:none;
+}
+.close-input:focus{border-color:var(--blue);}
+.icon-btn.lose:hover{border-color:var(--red);color:var(--red);}
+.icon-btn.del:hover{border-color:var(--red);color:var(--red);}
+
+.hidden{display:none !important;}
+
+footer{
+  text-align:center;
+  color:var(--text-muted);
+  font-size:0.75rem;
+  margin-top:36px;
+  font-family:var(--font-mono);
+}
+</style>
+</head>
+<body>
+
+<div class="stadium-bg" aria-hidden="true">
+<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#060B14"/>
+      <stop offset="55%" stop-color="#0B1220"/>
+      <stop offset="100%" stop-color="#11213A"/>
+    </linearGradient>
+    <linearGradient id="pitchGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1F7A4D"/>
+      <stop offset="100%" stop-color="#2CA868"/>
+    </linearGradient>
+    <linearGradient id="standFarGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1B2740"/>
+      <stop offset="100%" stop-color="#0F1728"/>
+    </linearGradient>
+    <linearGradient id="standNearGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#141D2E"/>
+      <stop offset="100%" stop-color="#070B12"/>
+    </linearGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFE3A8" stop-opacity="0.95"/>
+      <stop offset="55%" stop-color="#FFB627" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#FFB627" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pitchWash" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="900" fill="url(#skyGrad)"/>
+
+  <g fill="#FFFFFF" opacity="0.5">
+    <circle cx="120" cy="60" r="1.5"/>
+    <circle cx="300" cy="110" r="1.2"/>
+    <circle cx="500" cy="50" r="1.6"/>
+    <circle cx="720" cy="90" r="1.3"/>
+    <circle cx="900" cy="40" r="1.4"/>
+    <circle cx="1100" cy="100" r="1.5"/>
+    <circle cx="1300" cy="60" r="1.3"/>
+    <circle cx="1480" cy="120" r="1.6"/>
+    <circle cx="200" cy="170" r="1.1"/>
+    <circle cx="1400" cy="180" r="1.1"/>
+  </g>
+
+  <!-- far grandstand, across the pitch -->
+  <path d="M0,340 Q800,225 1600,340 L1600,430 Q800,320 0,430 Z" fill="url(#standFarGrad)"/>
+  <path d="M0,340 Q800,225 1600,340" fill="none" stroke="#2F9E5A" stroke-width="3" opacity="0.45"/>
+
+  <!-- far floodlights -->
+  <circle cx="430" cy="120" r="70" fill="url(#glowGrad)"/>
+  <rect x="424" y="150" width="12" height="190" fill="#2A3550"/>
+  <rect x="404" y="118" width="52" height="20" rx="3" fill="#D9E2F0"/>
+  <circle cx="1170" cy="120" r="70" fill="url(#glowGrad)"/>
+  <rect x="1164" y="150" width="12" height="190" fill="#2A3550"/>
+  <rect x="1144" y="118" width="52" height="20" rx="3" fill="#D9E2F0"/>
+
+  <!-- pitch, seen at an angle from high up -->
+  <path d="M480,378 L1120,378 L1400,660 L200,660 Z" fill="url(#pitchGrad)"/>
+  <path d="M480,378 L1120,378 L1160,458 L440,458 Z" fill="#FFFFFF" opacity="0.035"/>
+  <path d="M400,540 L1200,540 L1260,660 L340,660 Z" fill="#FFFFFF" opacity="0.035"/>
+  <ellipse cx="800" cy="520" rx="520" ry="150" fill="url(#pitchWash)"/>
+
+  <g fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="3">
+    <line x1="800" y1="378" x2="800" y2="660"/>
+    <ellipse cx="800" cy="519" rx="105" ry="52"/>
+    <path d="M620,378 L980,378 L942,438 L658,438 Z"/>
+    <path d="M330,660 L1270,660 L1138,558 L462,558 Z"/>
+  </g>
+
+  <!-- near stand tiers curving down toward the pitch -->
+  <path d="M0,900 L0,440 Q260,478 200,660 L0,900 Z" fill="url(#standNearGrad)"/>
+  <path d="M1600,900 L1600,440 Q1340,478 1400,660 L1600,900 Z" fill="url(#standNearGrad)"/>
+
+  <!-- floodlights right by our seats, towering up -->
+  <circle cx="95" cy="70" r="95" fill="url(#glowGrad)"/>
+  <rect x="86" y="110" width="16" height="430" fill="#2A3550"/>
+  <rect x="58" y="34" width="72" height="40" rx="4" fill="#D9E2F0"/>
+  <circle cx="1505" cy="70" r="95" fill="url(#glowGrad)"/>
+  <rect x="1498" y="110" width="16" height="430" fill="#2A3550"/>
+  <rect x="1470" y="34" width="72" height="40" rx="4" fill="#D9E2F0"/>
+
+  <!-- the row of seats right in front of us, top tier -->
+  <path d="M0,900 L0,845 Q40,822 80,845 Q120,868 160,845 Q200,822 240,845 Q280,868 320,845 Q360,822 400,845 Q440,868 480,845 Q520,822 560,845 Q600,868 640,845 Q680,822 720,845 Q760,868 800,845 Q840,822 880,845 Q920,868 960,845 Q1000,822 1040,845 Q1080,868 1120,845 Q1160,822 1200,845 Q1240,868 1280,845 Q1320,822 1360,845 Q1400,868 1440,845 Q1480,822 1520,845 Q1560,868 1600,845 L1600,900 Z" fill="#05080D"/>
+</svg>
+</div>
+
+<div class="wrap">
+
+  <div class="header">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>MARCADOR</h1>
+    </div>
+    <p class="tagline">Tu registro de apuestas, partido a partido.</p>
+  </div>
+
+  <div id="pageDashboard">
+
+  <!-- BANK -->
+  <div class="bank-hero">
+    <div class="bank-label">Bank total</div>
+    <div class="bank-value" id="bankTotal">$0.00</div>
+    <div class="bank-hint hidden" id="bankHint">Configura tu bank inicial para llevar el control completo.</div>
+    <div class="bank-withdrawn hidden" id="bankWithdrawn"></div>
+    <div class="bank-btn-row">
+      <button class="bank-edit-btn" id="bankEditBtn">✎ Editar bank inicial</button>
+      <button class="bank-edit-btn withdraw" id="bankWithdrawBtn">↓ Retirar</button>
+    </div>
+    <div class="bank-edit-form hidden" id="bankEditForm">
+      <input type="number" id="bankInitialInput" placeholder="Ej. 5000" min="0" step="0.01">
+      <button type="button" id="bankSaveBtn">Guardar</button>
+    </div>
+    <div class="bank-edit-form hidden" id="bankWithdrawForm">
+      <input type="number" id="bankWithdrawInput" placeholder="Monto a retirar" min="0" step="0.01">
+      <button type="button" id="bankWithdrawSaveBtn">Retirar</button>
+      <button type="button" class="ghost" id="bankWithdrawCancelBtn">Cancelar</button>
+    </div>
+    <div class="bank-status" id="bankStatus"></div>
+    <div class="withdraw-log hidden" id="withdrawLog"></div>
+  </div>
+
+  <!-- SCOREBOARD -->
+  <div class="scoreboard">
+    <div class="stat">
+      <div class="stat-label">Total apostado</div>
+      <div class="stat-value" id="statTotal">$0.00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Ganancia neta</div>
+      <div class="stat-value" id="statNet">$0.00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">% Acierto</div>
+      <div class="stat-value" id="statWinRate">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Apuestas</div>
+      <div class="stat-value" id="statCount">0</div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="panel">
+    <h2 class="panel-title"><span class="bar"></span>Progreso de resultados</h2>
+    <div class="chart-empty hidden" id="chartEmpty">Aún no tienes apuestas resueltas. Cuando marques alguna como ganada o perdida, aquí verás cómo evoluciona tu bank.</div>
+    <div id="chartContainer"></div>
+  </div>
+
+  <!-- FORM -->
+  <div class="panel">
+    <h2 class="panel-title"><span class="bar"></span>Registrar apuesta</h2>
+
+    <div class="scan-box" id="scanBox">
+      <input type="file" id="scanFile" accept="image/*" class="hidden">
+      <div class="scan-drop" id="scanDrop">
+        <div class="scan-icon">📷</div>
+        <div class="scan-text">
+          <b>Llenar desde una captura</b>
+          <span>Sube la foto de tu ticket y se completan los campos solos.</span>
+        </div>
+      </div>
+      <div class="scan-result hidden" id="scanResult">
+        <img id="scanPreview" alt="Captura del ticket">
+        <div class="scan-info">
+          <div class="scan-status" id="scanStatus"></div>
+          <button type="button" class="scan-clear" id="scanClear">Quitar imagen</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Eventos</label>
+      <div class="desc-list" id="eventList">
+        <div class="desc-row">
+          <input type="text" class="event-input" placeholder="Ej. Real Madrid vs Barcelona" data-eid="ev1">
+          <button type="button" class="desc-add-btn event" onclick="addEventRow()" title="Agregar otro evento a esta apuesta">+ Añadir evento</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-status" id="formStatus"></div>
+
+    <div class="field">
+      <label>Descripción de la apuesta</label>
+      <div id="descGroups"></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="casinoSelect">Casa de apuestas</label>
+        <select id="casinoSelect"></select>
+        <input type="text" id="casinoOther" class="hidden extra-input" placeholder="Escribe el nombre de la casa">
+      </div>
+      <div class="field">
+        <label for="tipsterInput">Tipster</label>
+        <input type="text" id="tipsterInput" list="tipsterList" placeholder="Opcional — ej. análisis propio" autocomplete="off">
+        <datalist id="tipsterList"></datalist>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="stakeInput">Cantidad apostada ($)</label>
+        <input type="number" id="stakeInput" placeholder="100" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label for="oddsInput">Momio</label>
+        <div class="odds-toggle">
+          <button type="button" class="toggle-btn" data-format="decimal">Decimal</button>
+          <button type="button" class="toggle-btn active" data-format="american">Americano</button>
+        </div>
+        <input type="number" id="oddsInput" placeholder="-110" step="1">
+      </div>
+    </div>
+
+    <div class="return-preview">
+      <div>
+        <div class="lab">Retorno potencial</div>
+        <div class="val" id="previewReturn">$0.00</div>
+      </div>
+      <div class="profit" id="previewProfit">Ganancia: $0.00</div>
+    </div>
+
+    <button class="btn-primary" id="addBetBtn">Registrar apuesta</button>
+  </div>
+
+  <!-- HISTORY CTA -->
+  <div class="panel">
+    <h2 class="panel-title"><span class="bar"></span>Historial</h2>
+    <p class="history-cta-text">Consulta el detalle de tus apuestas ya resueltas (ganadas y perdidas), con filtros por estado.</p>
+    <button class="btn-primary" id="goHistoryBtn">Ver Historial →</button>
+  </div>
+
+  <!-- ACTIVE BETS -->
+  <div class="panel">
+    <h2 class="panel-title"><span class="bar"></span>Apuestas activas</h2>
+    <div id="activeList"></div>
+  </div>
+
+  <!-- BACKUP -->
+  <div class="panel">
+    <h2 class="panel-title"><span class="bar"></span>Respaldo de datos</h2>
+    <p class="history-cta-text">Descarga un archivo con todas tus apuestas, tu bank y tus retiros. Guárdalo en tu carpeta de Google Drive para tener una copia fuera de este portal.</p>
+    <div class="backup-row">
+      <button class="btn-secondary" id="exportBtn">⬇ Descargar respaldo</button>
+      <button class="btn-secondary" id="importBtn">⬆ Restaurar respaldo</button>
+      <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+    </div>
+    <div class="backup-status" id="backupStatus"></div>
+    <textarea id="backupText" class="hidden backup-text" readonly></textarea>
+
+    <div class="drive-box" id="syncBox">
+      <div class="drive-head">
+        <span class="drive-title">Sincronización web</span>
+        <span class="drive-dot" id="syncDot"></span>
+      </div>
+      <div class="drive-setup hidden" id="syncSetup">
+        Ahora mismo tus datos se guardan solo en este dispositivo. Para que te sigan a cualquier navegador,
+        pega la dirección de tu hoja de sincronización en la línea <code>SYNC_URL</code>,
+        al principio del &lt;script&gt; de este archivo.
+      </div>
+      <div class="backup-row hidden" id="syncActions">
+        <button class="btn-secondary" id="syncNowBtn">Sincronizar ahora</button>
+        <button class="btn-secondary" id="syncCodeBtn">Cambiar código de acceso</button>
+      </div>
+      <div class="backup-status" id="syncStatus"></div>
+    </div>
+  </div>
+
+  </div><!-- /pageDashboard -->
+
+  <div id="pageHistory" class="hidden">
+    <div class="panel">
+      <div class="history-head">
+        <button class="back-btn" id="backBtn">← Volver</button>
+        <h2 class="panel-title" style="margin:0;"><span class="bar"></span>Historial completo</h2>
+      </div>
+      <div class="filters" style="margin-bottom:12px;">
+        <button class="filter-btn active" data-filter="todas">Todas</button>
+        <button class="filter-btn" data-filter="ganada">Ganadas</button>
+        <button class="filter-btn" data-filter="perdida">Perdidas</button>
+        <button class="filter-btn" data-filter="cerrada">Cerradas</button>
+      </div>
+      <div class="date-filter-row">
+        <input type="date" id="historyDateFilter">
+        <button class="filter-btn" id="clearDateFilter">Todas las fechas</button>
+        <button class="filter-btn hidden" id="collapseAllBtn">Ocultar todas</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <footer>Los datos de este portal se guardan solo en tu cuenta y no se comparten.</footer>
+
+</div>
+
+<script>
+/* ============================================================
+   PEGA AQUÍ LA DIRECCIÓN DE TU HOJA DE SINCRONIZACIÓN
+   (la que te da Google al publicar el script; termina en /exec)
+   Si la dejas vacía, el portal guarda solo en este dispositivo.
+   ============================================================ */
+const SYNC_URL = 'https://script.google.com/macros/s/AKfycbzjjQyalh-_ncmDarJq1n7__KamTjFoi8_AC1fJqK-9RgEbqiMDuzZrOoYyOoC91FvaZg/exec';
+
+let bets = [];
+let currentFilter = 'todas';
+let dateFilter = '';
+let oddsFormat = 'american';
+let bankInitial = 0;
+let withdrawals = [];
+let customCasinos = [];
+const DEFAULT_CASINOS = ['Winpot','Draftea','Caliente','Codere','Bet365','Betano','Betsson','Novibet','Strendus'];
+
+const el = id => document.getElementById(id);
+
+/* ---------------- Storage ----------------
+   Usa el almacenamiento de Claude si existe; si el portal est\u00e1 publicado
+   en una p\u00e1gina web, guarda en el navegador (localStorage).            */
+const Store = {
+  async get(key){
+    if(window.storage && window.storage.get) return await window.storage.get(key, false);
+    const v = localStorage.getItem('marcador:' + key);
+    return v === null ? null : { value: v };
+  },
+  async set(key, value){
+    if(window.storage && window.storage.set) return await window.storage.set(key, value, false);
+    localStorage.setItem('marcador:' + key, value);
+    return { value: value };
+  }
+};
+
+/* ---------------- Storage ---------------- */
+async function loadBets(){
+  try{
+    const res = await Store.get('bets-list');
+    bets = res && res.value ? JSON.parse(res.value) : [];
+  }catch(e){
+    bets = [];
+  }
+}
+
+async function saveBets(){
+  try{
+    await Store.set('bets-list', JSON.stringify(bets));
+  }catch(e){
+    console.error('No se pudo guardar', e);
+  }
+  scheduleDriveSync();
+}
+
+async function loadBankroll(){
+  try{
+    const res = await Store.get('bankroll-initial');
+    bankInitial = res && res.value ? (parseFloat(res.value) || 0) : 0;
+  }catch(e){
+    bankInitial = 0;
+  }
+}
+
+async function saveBankroll(){
+  try{
+    await Store.set('bankroll-initial', String(bankInitial));
+  }catch(e){
+    console.error('No se pudo guardar el bank', e);
+  }
+  scheduleDriveSync();
+}
+
+async function loadWithdrawals(){
+  try{
+    const res = await Store.get('bankroll-withdrawals');
+    withdrawals = res && res.value ? (JSON.parse(res.value) || []) : [];
+  }catch(e){
+    withdrawals = [];
+  }
+}
+
+async function saveWithdrawals(){
+  try{
+    await Store.set('bankroll-withdrawals', JSON.stringify(withdrawals));
+  }catch(e){
+    console.error('No se pudieron guardar los retiros', e);
+  }
+  scheduleDriveSync();
+}
+
+async function loadCasinos(){
+  try{
+    const res = await Store.get('casinos-custom');
+    customCasinos = res && res.value ? (JSON.parse(res.value) || []) : [];
+  }catch(e){
+    customCasinos = [];
+  }
+}
+
+async function saveCasinos(){
+  try{
+    await Store.set('casinos-custom', JSON.stringify(customCasinos));
+  }catch(e){
+    console.error('No se pudieron guardar las casas de apuestas', e);
+  }
+  scheduleDriveSync();
+}
+
+function casinoOptions(){
+  const fromBets = bets.map(b => b.casino).filter(Boolean);
+  const all = DEFAULT_CASINOS.concat(customCasinos, fromBets);
+  const seen = {};
+  return all.filter(c => {
+    const k = c.toLowerCase();
+    if(seen[k]) return false;
+    seen[k] = true;
+    return true;
+  });
+}
+
+function renderCasinoSelect(keep){
+  const sel = el('casinoSelect');
+  const current = keep || sel.value;
+  sel.innerHTML = '<option value="">\u2014 Sin especificar \u2014</option>' +
+    casinoOptions().map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('') +
+    '<option value="__otra__">+ Otra casa\u2026</option>';
+  if(current && current !== '__otra__'){
+    sel.value = current;
+    if(sel.value !== current) sel.value = '';
+  }
+}
+
+function renderTipsterList(){
+  const seen = {};
+  const names = bets.map(b => b.tipster).filter(Boolean).filter(t => {
+    const k = t.toLowerCase();
+    if(seen[k]) return false;
+    seen[k] = true;
+    return true;
+  });
+  el('tipsterList').innerHTML = names.map(t => '<option value="' + escapeHtml(t) + '"></option>').join('');
+}
+
+function totalWithdrawn(){
+  return withdrawals.reduce((s, w) => s + w.amount, 0);
+}
+
+async function removeWithdrawal(id){
+  withdrawals = withdrawals.filter(w => w.id !== id);
+  await saveWithdrawals();
+  renderScoreboard();
+}
+
+async function init(){
+  syncDescGroups();
+  renderSyncUI();
+  await Promise.all([loadBets(), loadBankroll(), loadWithdrawals(), loadCasinos()]);
+  renderAll();
+  if(syncConfigured()) syncPull(true);
+}
+
+let eventSeq = 1;
+
+function ensureEventIds(){
+  document.querySelectorAll('#eventList .event-input').forEach(inp => {
+    if(!inp.dataset.eid) inp.dataset.eid = 'ev' + (++eventSeq);
+  });
+}
+
+function addEventRow(){
+  const row = document.createElement('div');
+  row.className = 'desc-row';
+  row.innerHTML = '<input type="text" class="event-input" placeholder="Otro evento de esta apuesta" data-eid="ev' + (++eventSeq) + '">' +
+    '<button type="button" class="desc-remove-btn" onclick="removeEventRow(this)" title="Quitar evento">\u00d7</button>';
+  el('eventList').appendChild(row);
+  syncDescGroups();
+  row.querySelector('.event-input').focus();
+}
+
+function removeEventRow(btn){
+  btn.parentElement.remove();
+  syncDescGroups();
+}
+
+function resetEventRows(){
+  const rows = el('eventList').querySelectorAll('.desc-row');
+  rows.forEach((row, i) => {
+    if(i === 0){
+      row.querySelector('.event-input').value = '';
+    } else {
+      row.remove();
+    }
+  });
+  syncDescGroups();
+}
+
+function eventInputs(){
+  return Array.from(document.querySelectorAll('#eventList .event-input'));
+}
+
+function eventTitle(inp, idx){
+  return inp.value.trim() || ('Evento ' + (idx + 1));
+}
+
+function descRowHTML(value, isFirst){
+  return '<div class="desc-row">' +
+    '<input type="text" class="desc-input" placeholder="Ej. Real Madrid gana el partido" value="' + escapeHtml(value) + '">' +
+    (isFirst
+      ? '<button type="button" class="desc-add-btn" onclick="addDescRow(this)" title="Agregar otra descripci\u00f3n de este evento">+ Crear apuesta</button>'
+      : '<button type="button" class="desc-remove-btn" onclick="this.parentElement.remove()" title="Quitar">\u00d7</button>') +
+  '</div>';
+}
+
+/* Rebuilds one description group per event, keeping what ya estaba escrito */
+function syncDescGroups(){
+  ensureEventIds();
+  const prev = {};
+  document.querySelectorAll('#descGroups .desc-group').forEach(g => {
+    prev[g.dataset.eid] = Array.from(g.querySelectorAll('.desc-input')).map(i => i.value);
+  });
+
+  const groups = el('descGroups');
+  const inputs = eventInputs();
+  const multi = inputs.length > 1;
+  groups.innerHTML = '';
+
+  inputs.forEach((inp, idx) => {
+    const eid = inp.dataset.eid;
+    const vals = (prev[eid] && prev[eid].length) ? prev[eid] : [''];
+    const g = document.createElement('div');
+    g.className = 'desc-group';
+    g.dataset.eid = eid;
+    g.innerHTML =
+      (multi ? '<div class="desc-group-title">' + escapeHtml(eventTitle(inp, idx)) + '</div>' : '') +
+      '<div class="desc-list">' + vals.map((v, i) => descRowHTML(v, i === 0)).join('') + '</div>';
+    groups.appendChild(g);
+  });
+}
+
+function updateDescTitles(){
+  eventInputs().forEach((inp, idx) => {
+    const g = document.querySelector('#descGroups .desc-group[data-eid="' + inp.dataset.eid + '"]');
+    const t = g ? g.querySelector('.desc-group-title') : null;
+    if(t) t.textContent = eventTitle(inp, idx);
+  });
+}
+
+function addDescRow(btn){
+  const list = btn.closest('.desc-list');
+  const row = document.createElement('div');
+  row.className = 'desc-row';
+  row.innerHTML = '<input type="text" class="desc-input" placeholder="Otra descripci\u00f3n de este evento">' +
+    '<button type="button" class="desc-remove-btn" onclick="this.parentElement.remove()" title="Quitar">\u00d7</button>';
+  list.appendChild(row);
+  row.querySelector('.desc-input').focus();
+}
+
+function resetDescRows(){
+  el('descGroups').innerHTML = '';
+  syncDescGroups();
+}
+
+function escapeHtml(s){
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------------- Return preview ---------------- */
+function updatePreview(){
+  const stake = parseFloat(el('stakeInput').value) || 0;
+  const odds = parseFloat(el('oddsInput').value);
+  let profit = 0, ret = 0;
+  if(stake > 0 && isValidOdds(odds, oddsFormat)){
+    profit = computeProfit(stake, odds, oddsFormat);
+    ret = stake + profit;
+  }
+  el('previewReturn').textContent = formatMoney(ret);
+  el('previewProfit').textContent = 'Ganancia: ' + formatMoney(profit);
+}
+
+function formatMoney(n){
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(n).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function formatDateTime(value){
+  if(!value) return '';
+  const d = new Date(value);
+  if(isNaN(d.getTime())) return '';
+  return d.toLocaleString('es-MX', { day:'numeric', month:'short', year:'numeric', hour:'numeric', minute:'2-digit' });
+}
+
+function computeProfit(stake, odds, format){
+  if(!odds) return 0;
+  if(format === 'decimal'){
+    return stake * (odds - 1);
+  }
+  return odds > 0 ? stake * (odds / 100) : stake * (100 / Math.abs(odds));
+}
+
+function isValidOdds(odds, format){
+  if(isNaN(odds)) return false;
+  return format === 'decimal' ? odds > 1 : (odds !== 0 && Math.abs(odds) >= 100);
+}
+
+function formatOdds(odds, format){
+  if(odds === null || odds === undefined || isNaN(odds)) return '—';
+  return format === 'decimal' ? Number(odds).toFixed(2) : (odds > 0 ? '+' : '') + odds;
+}
+
+/* ---------------- Add bet ---------------- */
+async function addBet(){
+  const stake = parseFloat(el('stakeInput').value);
+  const odds = parseFloat(el('oddsInput').value);
+
+  const legs = [];
+  let missingDesc = false;
+  eventInputs().forEach(inp => {
+    const name = inp.value.trim();
+    if(!name) return;
+    const g = document.querySelector('#descGroups .desc-group[data-eid="' + inp.dataset.eid + '"]');
+    const descs = g
+      ? Array.from(g.querySelectorAll('.desc-input')).map(i => i.value.trim()).filter(v => v.length > 0)
+      : [];
+    if(descs.length === 0) missingDesc = true;
+    legs.push({ event: name, descs: descs });
+  });
+
+  const matches = legs.map(l => l.event);
+  const betTypes = legs.reduce((acc, l) => acc.concat(l.descs), []);
+
+  const casinoSel = el('casinoSelect').value;
+  const casino = casinoSel === '__otra__' ? el('casinoOther').value.trim() : casinoSel;
+  const tipster = el('tipsterInput').value.trim();
+
+  if(legs.length === 0 || missingDesc || isNaN(stake) || stake <= 0 || !isValidOdds(odds, oddsFormat)){
+    el('formStatus').textContent = legs.length === 0
+      ? 'Escribe al menos un evento.'
+      : missingDesc
+      ? (legs.length > 1
+          ? 'Cada evento necesita al menos una descripci\u00f3n.'
+          : 'Escribe al menos una descripci\u00f3n de la apuesta.')
+      : (oddsFormat === 'decimal'
+        ? 'Completa la cantidad y un momio decimal v\u00e1lido (mayor a 1, ej. 1.75).'
+        : 'Completa la cantidad y un momio americano v\u00e1lido (ej. -110 o +150).');
+    return;
+  }
+
+  const bet = {
+    id: (crypto.randomUUID ? crypto.randomUUID() : 'b' + Date.now() + Math.random().toString(16).slice(2)),
+    match: matches.join(' + '),
+    matches: matches,
+    legs: legs,
+    betTypes: betTypes,
+    casino: casino,
+    tipster: tipster,
+    stake: stake,
+    odds: odds,
+    oddsFormat: oddsFormat,
+    status: 'pendiente',
+    createdAt: Date.now()
+  };
+
+  if(casino && !casinoOptions().some(c => c.toLowerCase() === casino.toLowerCase())){
+    customCasinos.push(casino);
+    await saveCasinos();
+  }
+
+  bets.unshift(bet);
+  await saveBets();
+  resetForm();
+  renderAll();
+}
+
+function resetForm(){
+  clearScan();
+  const keepCasino = el('casinoSelect').value === '__otra__'
+    ? el('casinoOther').value.trim()
+    : el('casinoSelect').value;
+  el('casinoOther').value = '';
+  el('casinoOther').classList.add('hidden');
+  renderCasinoSelect(keepCasino);
+  el('tipsterInput').value = '';
+  el('stakeInput').value = '';
+  el('oddsInput').value = '';
+  resetEventRows();
+  resetDescRows();
+  el('formStatus').textContent = '';
+  updatePreview();
+}
+
+/* ---------------- Status / delete ---------------- */
+async function setStatus(id, status){
+  const b = bets.find(x => x.id === id);
+  if(!b) return;
+  b.status = status;
+  if(status === 'pendiente') delete b.closeAmount;
+  await saveBets();
+  renderAll();
+}
+
+/* Marca el resultado de un evento dentro de la apuesta (segundo clic lo deja pendiente) */
+async function setLegStatus(betId, index, status){
+  const b = bets.find(x => x.id === betId);
+  if(!b) return;
+  if(!b.legs || !b.legs.length){
+    b.legs = betLegs(b).map(l => ({ event: l.event, descs: l.descs.slice() }));
+  }
+  const leg = b.legs[index];
+  if(!leg) return;
+  leg.status = (leg.status === status) ? 'pendiente' : status;
+  await saveBets();
+  renderAll();
+}
+
+let collapsedBets = {};
+
+function toggleTicket(id){
+  collapsedBets[id] = !collapsedBets[id];
+  renderHistory();
+}
+
+function setAllCollapsed(state){
+  const resolved = bets.filter(b => b.status !== 'pendiente');
+  resolved.forEach(b => { collapsedBets[b.id] = state; });
+  renderHistory();
+}
+
+let closingBetId = null;
+
+function openCloseForm(id){
+  closingBetId = id;
+  renderAll();
+  const inp = el('closeInput_' + id);
+  if(inp) inp.focus();
+}
+
+function cancelClose(){
+  closingBetId = null;
+  renderAll();
+}
+
+async function confirmClose(id){
+  const inp = el('closeInput_' + id);
+  const val = inp ? parseFloat(inp.value) : NaN;
+  if(isNaN(val) || val < 0){
+    if(inp) inp.style.borderColor = 'var(--red)';
+    return;
+  }
+  const b = bets.find(x => x.id === id);
+  if(!b) return;
+  b.status = 'cerrada';
+  b.closeAmount = val;
+  closingBetId = null;
+  await saveBets();
+  renderAll();
+}
+
+async function deleteBet(id){
+  bets = bets.filter(x => x.id !== id);
+  await saveBets();
+  renderAll();
+}
+
+/* ---------------- Render ---------------- */
+function renderAll(){
+  renderCasinoSelect();
+  renderTipsterList();
+  renderScoreboard();
+  renderChart();
+  renderActiveBets();
+  renderHistory();
+}
+
+function renderScoreboard(){
+  const totalStaked = bets.reduce((s,b) => s + b.stake, 0);
+  const won = bets.filter(b => b.status === 'ganada');
+  const lost = bets.filter(b => b.status === 'perdida');
+  const closed = bets.filter(b => b.status === 'cerrada');
+  const netProfit = won.reduce((s,b) => s + computeProfit(b.stake, b.odds, b.oddsFormat || 'decimal'), 0)
+    - lost.reduce((s,b) => s + b.stake, 0)
+    + closed.reduce((s,b) => s + (b.closeAmount - b.stake), 0);
+  const resolvedCount = won.length + lost.length;
+  const winRate = resolvedCount > 0 ? Math.round((won.length / resolvedCount) * 100) + '%' : '—';
+
+  const withdrawn = totalWithdrawn();
+  const bankTotal = bankInitial + netProfit - withdrawn;
+  const bankEl = el('bankTotal');
+  bankEl.textContent = formatMoney(bankTotal);
+  bankEl.classList.remove('positive','negative');
+  if(netProfit > 0) bankEl.classList.add('positive');
+  else if(netProfit < 0) bankEl.classList.add('negative');
+  el('bankHint').classList.toggle('hidden', bankInitial !== 0);
+
+  const wEl = el('bankWithdrawn');
+  wEl.textContent = 'Retirado: ' + formatMoney(withdrawn);
+  wEl.classList.toggle('hidden', withdrawn <= 0);
+
+  const log = el('withdrawLog');
+  log.classList.toggle('hidden', withdrawals.length === 0);
+  log.innerHTML = withdrawals.slice().sort((a,b) => b.date - a.date).map(w =>
+    '<div class="withdraw-item">' +
+      '<span class="amount">' + formatMoney(w.amount) + '</span>' +
+      '<span>' + formatDateTime(w.date) + '</span>' +
+      '<button onclick="removeWithdrawal(\'' + w.id + '\')" title="Deshacer este retiro">×</button>' +
+    '</div>').join('');
+
+  el('statTotal').textContent = formatMoney(totalStaked);
+  const netEl = el('statNet');
+  netEl.textContent = formatMoney(netProfit);
+  netEl.classList.remove('positive','negative');
+  if(netProfit > 0) netEl.classList.add('positive');
+  else if(netProfit < 0) netEl.classList.add('negative');
+
+  el('statWinRate').textContent = winRate;
+  el('statCount').textContent = bets.length;
+}
+
+function renderChart(){
+  const container = el('chartContainer');
+  const resolved = bets.filter(b => b.status === 'ganada' || b.status === 'perdida' || b.status === 'cerrada').slice().sort((a,b) => a.createdAt - b.createdAt);
+
+  if(resolved.length === 0){
+    container.innerHTML = '';
+    el('chartEmpty').classList.remove('hidden');
+    return;
+  }
+  el('chartEmpty').classList.add('hidden');
+
+  const values = [bankInitial];
+  resolved.forEach(b => {
+    const format = b.oddsFormat || 'decimal';
+    let delta;
+    if(b.status === 'ganada') delta = computeProfit(b.stake, b.odds, format);
+    else if(b.status === 'perdida') delta = -b.stake;
+    else delta = b.closeAmount - b.stake;
+    values.push(values[values.length - 1] + delta);
+  });
+
+  const w = 800, h = 220, padX = 16, padTop = 20, padBottom = 18;
+  const n = values.length;
+  let minVal = Math.min(...values), maxVal = Math.max(...values);
+  if(minVal === maxVal){ minVal -= 10; maxVal += 10; }
+  const range = maxVal - minVal;
+
+  const xAt = i => padX + (w - padX * 2) * (n === 1 ? 0 : i / (n - 1));
+  const yAt = v => padTop + (h - padTop - padBottom) * (1 - (v - minVal) / range);
+
+  const points = values.map((v,i) => [xAt(i), yAt(v)]);
+  const linePath = points.map((p,i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const areaPath = linePath + ' L' + points[points.length-1][0].toFixed(1) + ',' + (h - padBottom) + ' L' + points[0][0].toFixed(1) + ',' + (h - padBottom) + ' Z';
+
+  const finalUp = values[values.length - 1] >= bankInitial;
+  const lineColor = finalUp ? '#22935B' : '#E5484D';
+  const fillId = finalUp ? 'chartFillPos' : 'chartFillNeg';
+  const baseY = yAt(bankInitial).toFixed(1);
+
+  const dots = n <= 40 ? points.map(p => '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.5" fill="' + lineColor + '"/>').join('') : '';
+
+  container.innerHTML =
+    '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs>' +
+        '<linearGradient id="chartFillPos" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%" stop-color="#22935B" stop-opacity="0.35"/>' +
+          '<stop offset="100%" stop-color="#22935B" stop-opacity="0"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="chartFillNeg" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%" stop-color="#E5484D" stop-opacity="0.35"/>' +
+          '<stop offset="100%" stop-color="#E5484D" stop-opacity="0"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+      '<line x1="' + padX + '" y1="' + baseY + '" x2="' + (w - padX) + '" y2="' + baseY + '" stroke="#8A95A6" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>' +
+      '<path d="' + areaPath + '" fill="url(#' + fillId + ')"/>' +
+      '<path d="' + linePath + '" fill="none" stroke="' + lineColor + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+      dots +
+      '<text x="' + (padX + 4) + '" y="' + (padTop + 12) + '" font-family="Space Mono, monospace" font-size="11" fill="#8A95A6">Inicio ' + formatMoney(bankInitial) + '</text>' +
+      '<text x="' + (w - padX - 4) + '" y="' + (padTop + 12) + '" text-anchor="end" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="' + lineColor + '">' + formatMoney(values[values.length - 1]) + '</text>' +
+    '</svg>';
+}
+
+function betLegs(b){
+  if(b.legs && b.legs.length) return b.legs;
+  const names = b.matches && b.matches.length ? b.matches : (b.match ? [b.match] : ['Sin especificar']);
+  const types = b.betTypes && b.betTypes.length ? b.betTypes : (b.betType ? [b.betType] : []);
+  return names.map((n, i) => ({ event: n, descs: i === 0 ? types : [] }));
+}
+
+/* Parlay = varios eventos | Crear apuesta = 1 evento con varias selecciones | Derecha = 1 sola selecci\u00f3n */
+function betTitle(legs){
+  if(legs.length > 1) return 'Parlay';
+  const descs = (legs[0] && legs[0].descs) ? legs[0].descs.length : 0;
+  return descs > 1 ? 'Crear apuesta' : 'Derecha';
+}
+
+function ticketCardHTML(b, collapsible){
+  const format = b.oddsFormat || 'decimal';
+  const profit = computeProfit(b.stake, b.odds, format);
+  const ret = b.stake + profit;
+
+  let actions;
+  if(closingBetId === b.id){
+    actions =
+      '<input type="number" class="close-input" id="closeInput_' + b.id + '" placeholder="Monto recibido" step="0.01" min="0">' +
+      '<button class="icon-btn win" onclick="confirmClose(\'' + b.id + '\')" title="Confirmar cierre">✓</button>' +
+      '<button class="icon-btn" onclick="cancelClose()" title="Cancelar">✕</button>';
+  } else if(b.status === 'pendiente'){
+    actions =
+      '<button class="icon-btn win" onclick="setStatus(\'' + b.id + '\',\'ganada\')" title="Marcar como ganada">✓</button>' +
+      '<button class="icon-btn lose" onclick="setStatus(\'' + b.id + '\',\'perdida\')" title="Marcar como perdida">✕</button>' +
+      '<button class="icon-btn close" onclick="openCloseForm(\'' + b.id + '\')" title="Cerrar apuesta anticipadamente">🔒</button>';
+  } else {
+    actions = '<button class="icon-btn" onclick="setStatus(\'' + b.id + '\',\'pendiente\')" title="Reabrir">↺</button>';
+  }
+
+  const legs = betLegs(b);
+  const dateLabel = formatDateTime(b.createdAt);
+  const multi = legs.length > 1;
+
+  const legsHTML = legs.map((leg, i) => {
+    const ls = leg.status || 'pendiente';
+    return '<div class="ticket-leg leg-' + ls + '">' +
+      '<div class="leg-info">' +
+        '<div class="ticket-match-name">' +
+          (ls === 'ganada' ? '<span class="leg-mark-icon win">✓</span>' : ls === 'perdida' ? '<span class="leg-mark-icon lose">✕</span>' : (multi ? '• ' : '')) +
+          escapeHtml(leg.event) +
+        '</div>' +
+        '<div class="tags">' + leg.descs.map(d => '<span class="tag">' + escapeHtml(d) + '</span>').join('') + '</div>' +
+      '</div>' +
+      '<div class="leg-actions">' +
+        '<button class="icon-btn leg-btn win' + (ls === 'ganada' ? ' on' : '') + '" onclick="setLegStatus(\'' + b.id + '\',' + i + ',\'ganada\')" title="Este evento se gan\u00f3">✓</button>' +
+        '<button class="icon-btn leg-btn lose' + (ls === 'perdida' ? ' on' : '') + '" onclick="setLegStatus(\'' + b.id + '\',' + i + ',\'perdida\')" title="Este evento se perdi\u00f3">✕</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  const legsWon = legs.filter(l => l.status === 'ganada').length;
+  const legsLost = legs.filter(l => l.status === 'perdida').length;
+  const legsSummary = (multi && (legsWon + legsLost) > 0)
+    ? '<div class="num-block"><div class="num-label">Eventos</div><div class="num-value leg-count">' +
+        '<span class="won">' + legsWon + '✓</span> <span class="lost">' + legsLost + '✕</span> ' +
+        '<span class="pend">/ ' + legs.length + '</span></div></div>'
+    : '';
+
+  const title = betTitle(legs);
+  const isCollapsed = collapsible && collapsedBets[b.id];
+
+  const header = '<div class="ticket-head">' +
+    '<span class="bet-title t-' + title.split(' ')[0].toLowerCase() + '">' + title + '</span>' +
+    (collapsible
+      ? '<button class="collapse-btn" onclick="toggleTicket(\'' + b.id + '\')" title="' + (isCollapsed ? 'Mostrar' : 'Ocultar') + ' esta apuesta">' +
+          (isCollapsed ? 'Mostrar \u25be' : 'Ocultar \u25b4') +
+        '</button>'
+      : '') +
+  '</div>';
+
+  const collapsedPeek = '<div class="ticket-peek">' +
+      '<span class="peek-name">' + escapeHtml(legs.map(l => l.event).join(' + ')) + '</span>' +
+      '<span class="peek-nums">' + formatMoney(b.stake) + ' \u00b7 <span class="status-badge ' + b.status + '">' + b.status + '</span></span>' +
+    '</div>';
+
+  if(isCollapsed){
+    return '<div class="ticket status-' + b.status + ' collapsed">' + header + collapsedPeek + '</div>';
+  }
+
+  return '<div class="ticket status-' + b.status + '">' +
+    header +
+    '<div class="ticket-legs">' + legsHTML + '</div>' +
+    (dateLabel ? '<div class="ticket-date">' + dateLabel + '</div>' : '') +
+    ((b.casino || b.tipster) ?
+      '<div class="ticket-meta">' +
+        (b.casino ? '<span class="meta-chip casino">\u25c6 ' + escapeHtml(b.casino) + '</span>' : '') +
+        (b.tipster ? '<span class="meta-chip tipster">\u25cf ' + escapeHtml(b.tipster) + '</span>' : '') +
+      '</div>' : '') +
+    '<div class="ticket-divider"></div>' +
+    '<div class="ticket-bottom">' +
+      '<div class="ticket-nums">' +
+        (b.status === 'cerrada' ? (function(){
+          const realOdds = b.stake > 0 ? (b.closeAmount / b.stake) : 0;
+          const realProfit = b.closeAmount - b.stake;
+          return '<div class="num-block"><div class="num-label">Cantidad</div><div class="num-value">' + formatMoney(b.stake) + '</div></div>' +
+            '<div class="num-block"><div class="num-label">Momio original</div><div class="num-value">' + formatOdds(b.odds, format) + '</div></div>' +
+            '<div class="num-block"><div class="num-label">Monto cerrado</div><div class="num-value">' + formatMoney(b.closeAmount) + '</div></div>' +
+            '<div class="num-block"><div class="num-label">Momio real</div><div class="num-value">' + realOdds.toFixed(2) + '</div></div>' +
+            '<div class="num-block"><div class="num-label">' + (realProfit >= 0 ? 'Ganancia' : 'Pérdida') + '</div><div class="num-value">' + formatMoney(realProfit) + '</div></div>';
+        })() :
+        '<div class="num-block"><div class="num-label">Cantidad</div><div class="num-value">' + formatMoney(b.stake) + '</div></div>' +
+        '<div class="num-block"><div class="num-label">Momio (' + (format === 'decimal' ? 'Dec' : 'Am') + ')</div><div class="num-value">' + formatOdds(b.odds, format) + '</div></div>' +
+        '<div class="num-block"><div class="num-label">' + (b.status === 'ganada' ? 'Ganancia' : 'Retorno potencial') + '</div><div class="num-value">' + formatMoney(b.status === 'ganada' ? profit : ret) + '</div></div>') +
+        legsSummary +
+      '</div>' +
+      '<div class="ticket-actions">' +
+        '<span class="status-badge ' + b.status + '">' + b.status + '</span>' +
+        actions +
+        '<button class="icon-btn del" onclick="deleteBet(\'' + b.id + '\')" title="Eliminar">🗑</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderActiveBets(){
+  const list = el('activeList');
+  const active = bets.filter(b => b.status === 'pendiente');
+
+  if(active.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="big">🎟️</div>No tienes apuestas activas en este momento.</div>';
+    return;
+  }
+
+  list.innerHTML = active.map(ticketCardHTML).join('');
+}
+
+function dateKeyLocal(ts){
+  const d = new Date(ts);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+
+function renderHistory(){
+  const list = el('historyList');
+  const resolved = bets.filter(b => b.status !== 'pendiente');
+  let filtered = currentFilter === 'todas' ? resolved : resolved.filter(b => b.status === currentFilter);
+  if(dateFilter){
+    filtered = filtered.filter(b => dateKeyLocal(b.createdAt) === dateFilter);
+  }
+
+  if(filtered.length === 0){
+    el('collapseAllBtn').classList.add('hidden');
+    list.innerHTML = '<div class="empty-state"><div class="big">🏟️</div>' +
+      (resolved.length === 0
+        ? 'Aún no tienes apuestas resueltas.<br>Cuando marques una como ganada o perdida, aparecerá aquí.'
+        : 'No hay apuestas con estos filtros.') +
+      '</div>';
+    return;
+  }
+
+  const anyOpen = filtered.some(b => !collapsedBets[b.id]);
+  el('collapseAllBtn').classList.remove('hidden');
+  el('collapseAllBtn').textContent = anyOpen ? 'Ocultar todas' : 'Mostrar todas';
+  el('collapseAllBtn').onclick = () => setAllCollapsed(anyOpen);
+
+  list.innerHTML = filtered.map(b => ticketCardHTML(b, true)).join('');
+}
+
+/* ---------------- Respaldo ---------------- */
+function backupPayload(){
+  return {
+    portal: 'MARCADOR',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    bankInitial: bankInitial,
+    withdrawals: withdrawals,
+    customCasinos: customCasinos,
+    bets: bets
+  };
+}
+
+function backupFileName(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return 'marcador-respaldo-' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + '.json';
+}
+
+function setBackupStatus(msg, kind){
+  const st = el('backupStatus');
+  st.textContent = msg;
+  st.classList.remove('ok','err');
+  if(kind) st.classList.add(kind);
+}
+
+function exportBackup(){
+  const json = JSON.stringify(backupPayload(), null, 2);
+  try{
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = backupFileName();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    el('backupText').classList.add('hidden');
+    setBackupStatus('Respaldo descargado (' + bets.length + ' apuestas). Gu\u00e1rdalo en tu carpeta de Google Drive.', 'ok');
+  }catch(e){
+    const ta = el('backupText');
+    ta.value = json;
+    ta.classList.remove('hidden');
+    ta.select();
+    setBackupStatus('No se pudo descargar el archivo aqu\u00ed. Copia el texto de abajo y gu\u00e1rdalo como archivo .json en Drive.', 'err');
+  }
+}
+
+async function importBackup(file){
+  try{
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if(!data || !Array.isArray(data.bets)){
+      setBackupStatus('Ese archivo no parece un respaldo v\u00e1lido del portal.', 'err');
+      return;
+    }
+    if(!confirm('Esto reemplazar\u00e1 tus datos actuales (' + bets.length + ' apuestas) por los del respaldo (' + data.bets.length + ' apuestas). \u00bfContinuar?')){
+      setBackupStatus('Restauraci\u00f3n cancelada. Tus datos siguen igual.');
+      return;
+    }
+    bets = data.bets;
+    bankInitial = typeof data.bankInitial === 'number' ? data.bankInitial : 0;
+    withdrawals = Array.isArray(data.withdrawals) ? data.withdrawals : [];
+    customCasinos = Array.isArray(data.customCasinos) ? data.customCasinos : [];
+    collapsedBets = {};
+    await Promise.all([saveBets(), saveBankroll(), saveWithdrawals(), saveCasinos()]);
+    renderAll();
+    setBackupStatus('Respaldo restaurado: ' + bets.length + ' apuestas cargadas.', 'ok');
+  }catch(e){
+    setBackupStatus('No se pudo leer el archivo. Aseg\u00farate de que sea el .json que descargaste.', 'err');
+  }
+}
+
+/* ---------------- Lectura de la captura ---------------- */
+function setScanStatus(msg, kind){
+  const st = el('scanStatus');
+  st.textContent = msg;
+  st.classList.remove('ok','err','working');
+  if(kind) st.classList.add(kind);
+}
+
+async function fileToScaledImage(file){
+  const dataUrl = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = () => rej(new Error('lectura'));
+    r.readAsDataURL(file);
+  });
+  const img = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = () => rej(new Error('imagen'));
+    i.src = dataUrl;
+  });
+  const MAX = 1400;
+  let w = img.naturalWidth, h = img.naturalHeight;
+  if(Math.max(w, h) > MAX){
+    const scale = MAX / Math.max(w, h);
+    w = Math.round(w * scale);
+    h = Math.round(h * scale);
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  const out = canvas.toDataURL('image/jpeg', 0.85);
+  return { base64: out.split(',')[1], preview: out };
+}
+
+const SCAN_PROMPT = [
+  'Esta es la captura de un ticket de apuestas deportivas.',
+  'Devuelve SOLO un objeto JSON, sin explicaciones y sin backticks, con esta forma exacta:',
+  '{"casino":"","tipster":"","stake":null,"odds":null,"oddsFormat":"american","events":[{"event":"","selections":[""]}]}',
+  '',
+  'Reglas:',
+  '- "events": un objeto por cada partido o evento del ticket. "event" es el enfrentamiento (ej. "Real Madrid vs Barcelona") y "selections" son las selecciones apostadas de ese evento (ej. "Gana Real Madrid", "Mas de 2.5 goles").',
+  '- Si es una apuesta simple, devuelve un solo evento con una sola seleccion.',
+  '- "stake": solo el numero de lo apostado, sin simbolos.',
+  '- "odds": el momio total del ticket como numero. Si viene como +150 o -110 usa "american"; si viene como 1.85 o 2.40 usa "decimal".',
+  '- "casino": el nombre de la casa de apuestas si se ve en la imagen (Winpot, Draftea, Caliente, Bet365, etc.), si no, cadena vacia.',
+  '- "tipster": cadena vacia salvo que la imagen indique claramente quien dio el pronostico.',
+  '- Si un dato no aparece, usa null para los numeros y "" para los textos.'
+].join('\n');
+
+async function scanTicketImage(file){
+  el('scanDrop').classList.add('hidden');
+  el('scanResult').classList.remove('hidden');
+  setScanStatus('Leyendo la captura\u2026', 'working');
+
+  let img;
+  try{
+    img = await fileToScaledImage(file);
+  }catch(e){
+    setScanStatus('No se pudo abrir esa imagen. Intenta con otra captura.', 'err');
+    return;
+  }
+  el('scanPreview').src = img.preview;
+
+  try{
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: img.base64 } },
+            { type: 'text', text: SCAN_PROMPT }
+          ]
+        }]
+      })
+    });
+    if(!response.ok) throw new Error('http ' + response.status);
+    const data = await response.json();
+    const text = (data.content || []).map(c => c.type === 'text' ? c.text : '').join('\n');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const start = clean.indexOf('{');
+    const end = clean.lastIndexOf('}');
+    if(start < 0 || end < 0) throw new Error('formato');
+    const parsed = JSON.parse(clean.slice(start, end + 1));
+    applyScan(parsed);
+  }catch(e){
+    setScanStatus('No se pudo leer el ticket automáticamente. Puedes llenar los campos a mano; la imagen no se guarda.', 'err');
+  }
+}
+
+/* Vuelca lo leido en el formulario, sin registrar nada todavia */
+function applyScan(data){
+  const events = Array.isArray(data.events) ? data.events.filter(e => e && e.event) : [];
+  if(events.length === 0){
+    setScanStatus('No reconocí ningún evento en esa imagen. Revisa que se vea completo el ticket.', 'err');
+    return;
+  }
+
+  resetEventRows();
+  for(let i = 1; i < events.length; i++) addEventRow();
+  const inputs = eventInputs();
+  events.forEach((ev, i) => { if(inputs[i]) inputs[i].value = String(ev.event).trim(); });
+  syncDescGroups();
+
+  const groups = document.querySelectorAll('#descGroups .desc-group');
+  events.forEach((ev, i) => {
+    const g = groups[i];
+    if(!g) return;
+    const sels = Array.isArray(ev.selections) ? ev.selections.filter(x => x && String(x).trim()) : [];
+    if(sels.length === 0) return;
+    for(let k = 1; k < sels.length; k++) addDescRow(g.querySelector('.desc-add-btn'));
+    const fields = g.querySelectorAll('.desc-input');
+    sels.forEach((sel, k) => { if(fields[k]) fields[k].value = String(sel).trim(); });
+  });
+
+  if(typeof data.stake === 'number' && data.stake > 0) el('stakeInput').value = data.stake;
+
+  if(data.oddsFormat === 'american' || data.oddsFormat === 'decimal'){
+    const btn = document.querySelector('.toggle-btn[data-format="' + data.oddsFormat + '"]');
+    if(btn) btn.click();
+  }
+  if(typeof data.odds === 'number') el('oddsInput').value = data.odds;
+
+  if(data.casino){
+    const casino = String(data.casino).trim();
+    const match = casinoOptions().find(c => c.toLowerCase() === casino.toLowerCase());
+    if(match){
+      el('casinoSelect').value = match;
+    } else {
+      customCasinos.push(casino);
+      saveCasinos();
+      renderCasinoSelect(casino);
+    }
+  }
+  if(data.tipster) el('tipsterInput').value = String(data.tipster).trim();
+
+  updatePreview();
+  const faltan = [];
+  if(!el('stakeInput').value) faltan.push('la cantidad');
+  if(!el('oddsInput').value) faltan.push('el momio');
+  setScanStatus(faltan.length
+    ? 'Listo, pero no alcancé a leer ' + faltan.join(' ni ') + '. Completa y revisa antes de registrar.'
+    : 'Campos completados. Revísalos y presiona Registrar apuesta.', faltan.length ? 'working' : 'ok');
+}
+
+function clearScan(){
+  el('scanFile').value = '';
+  el('scanPreview').src = '';
+  el('scanResult').classList.add('hidden');
+  el('scanDrop').classList.remove('hidden');
+  setScanStatus('');
+}
+
+/* ---------------- Sincronización web ---------------- */
+let syncTimer = null;
+let syncBusy = false;
+let syncReady = false;
+
+function syncConfigured(){
+  return typeof SYNC_URL === 'string' && SYNC_URL.trim().length > 0;
+}
+
+function syncCode(){
+  return localStorage.getItem('marcador:sync-code') || '';
+}
+
+function setSyncStatus(msg, kind){
+  const st = el('syncStatus');
+  if(!st) return;
+  st.textContent = msg;
+  st.classList.remove('ok','err');
+  if(kind) st.classList.add(kind);
+}
+
+function renderSyncUI(){
+  const on = syncConfigured();
+  el('syncSetup').classList.toggle('hidden', on);
+  el('syncActions').classList.toggle('hidden', !on);
+  el('syncDot').classList.toggle('on', syncReady);
+}
+
+function askSyncCode(force){
+  if(!syncConfigured()) return '';
+  let code = syncCode();
+  if(!code || force){
+    const typed = prompt('Escribe tu código de acceso (el mismo que pusiste en tu hoja de sincronización):', code || '');
+    if(typed === null) return code;
+    code = typed.trim();
+    localStorage.setItem('marcador:sync-code', code);
+  }
+  return code;
+}
+
+async function syncRequest(payload){
+  const res = await fetch(SYNC_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('http ' + res.status);
+  const data = await res.json();
+  if(!data.ok) throw new Error(data.error || 'error');
+  return data;
+}
+
+async function syncPull(silent){
+  if(!syncConfigured()) return;
+  const code = askSyncCode(false);
+  if(!code) return;
+  try{
+    setSyncStatus('Buscando tus datos en la nube…');
+    const res = await syncRequest({ action: 'load', code: code });
+    syncReady = true;
+    renderSyncUI();
+
+    const remote = res.data;
+    if(!remote || !Array.isArray(remote.bets)){
+      setSyncStatus('Todavía no hay nada en la nube. Se subirán los datos de este dispositivo.');
+      await syncPush();
+      return;
+    }
+    if(!silent && bets.length > 0 && !confirm('La nube tiene ' + remote.bets.length + ' apuestas y este dispositivo ' + bets.length + '. ¿Cargar las de la nube?')){
+      setSyncStatus('Cancelado. Tus datos de este dispositivo siguen igual.');
+      return;
+    }
+    bets = remote.bets;
+    bankInitial = typeof remote.bankInitial === 'number' ? remote.bankInitial : 0;
+    withdrawals = Array.isArray(remote.withdrawals) ? remote.withdrawals : [];
+    customCasinos = Array.isArray(remote.customCasinos) ? remote.customCasinos : [];
+    collapsedBets = {};
+    await Promise.all([
+      Store.set('bets-list', JSON.stringify(bets)),
+      Store.set('bankroll-initial', String(bankInitial)),
+      Store.set('bankroll-withdrawals', JSON.stringify(withdrawals)),
+      Store.set('casinos-custom', JSON.stringify(customCasinos))
+    ]);
+    renderAll();
+    setSyncStatus('Datos al día · ' + bets.length + ' apuestas', 'ok');
+  }catch(e){
+    syncReady = false;
+    renderSyncUI();
+    setSyncStatus(e.message === 'codigo'
+      ? 'Código de acceso incorrecto. Usa "Cambiar código de acceso".'
+      : 'No se pudo conectar con la nube. Revisa tu internet o la dirección SYNC_URL.', 'err');
+  }
+}
+
+async function syncPush(){
+  if(!syncConfigured() || syncBusy) return;
+  const code = syncCode();
+  if(!code) return;
+  syncBusy = true;
+  try{
+    await syncRequest({ action: 'save', code: code, data: backupPayload() });
+    syncReady = true;
+    renderSyncUI();
+    setSyncStatus('Guardado en la nube · ' + formatDateTime(Date.now()), 'ok');
+  }catch(e){
+    syncReady = false;
+    renderSyncUI();
+    setSyncStatus(e.message === 'codigo'
+      ? 'Código de acceso incorrecto. Usa "Cambiar código de acceso".'
+      : 'No se pudo guardar en la nube. Tus datos siguen en este dispositivo.', 'err');
+  }
+  syncBusy = false;
+}
+
+/* Se dispara sola despues de cada cambio guardado */
+function scheduleDriveSync(){
+  if(!syncConfigured() || !syncCode()) return;
+  clearTimeout(syncTimer);
+  setSyncStatus('Guardando en la nube…');
+  syncTimer = setTimeout(syncPush, 2000);
+}
+
+/* ---------------- Events ---------------- */
+function showPage(name){
+  el('pageDashboard').classList.toggle('hidden', name !== 'dashboard');
+  el('pageHistory').classList.toggle('hidden', name !== 'history');
+  window.scrollTo(0, 0);
+}
+
+el('goHistoryBtn').addEventListener('click', () => showPage('history'));
+el('backBtn').addEventListener('click', () => showPage('dashboard'));
+
+el('bankEditBtn').addEventListener('click', () => {
+  el('bankInitialInput').value = bankInitial || '';
+  el('bankEditForm').classList.remove('hidden');
+  el('bankInitialInput').focus();
+});
+
+el('bankSaveBtn').addEventListener('click', async () => {
+  const val = parseFloat(el('bankInitialInput').value);
+  if(isNaN(val) || val < 0) return;
+  bankInitial = val;
+  await saveBankroll();
+  el('bankEditForm').classList.add('hidden');
+  renderScoreboard();
+});
+
+el('scanDrop').addEventListener('click', () => el('scanFile').click());
+
+el('scanFile').addEventListener('change', async e => {
+  const file = e.target.files && e.target.files[0];
+  if(file) await scanTicketImage(file);
+});
+
+el('scanClear').addEventListener('click', clearScan);
+
+['dragover','dragenter'].forEach(evt =>
+  el('scanDrop').addEventListener(evt, e => { e.preventDefault(); el('scanDrop').classList.add('dragover'); }));
+['dragleave','drop'].forEach(evt =>
+  el('scanDrop').addEventListener(evt, e => { e.preventDefault(); el('scanDrop').classList.remove('dragover'); }));
+el('scanDrop').addEventListener('drop', async e => {
+  const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(file && file.type.indexOf('image/') === 0) await scanTicketImage(file);
+});
+
+el('syncNowBtn').addEventListener('click', () => syncPull(false));
+
+el('syncCodeBtn').addEventListener('click', () => {
+  askSyncCode(true);
+  syncPull(true);
+});
+
+el('exportBtn').addEventListener('click', exportBackup);
+
+el('importBtn').addEventListener('click', () => el('importFile').click());
+
+el('importFile').addEventListener('change', async e => {
+  const file = e.target.files && e.target.files[0];
+  if(file) await importBackup(file);
+  e.target.value = '';
+});
+
+el('casinoSelect').addEventListener('change', () => {
+  const other = el('casinoSelect').value === '__otra__';
+  el('casinoOther').classList.toggle('hidden', !other);
+  if(other) el('casinoOther').focus();
+});
+
+el('bankWithdrawBtn').addEventListener('click', () => {
+  el('bankWithdrawInput').value = '';
+  el('bankStatus').textContent = '';
+  el('bankStatus').classList.remove('ok');
+  el('bankWithdrawForm').classList.remove('hidden');
+  el('bankWithdrawInput').focus();
+});
+
+el('bankWithdrawCancelBtn').addEventListener('click', () => {
+  el('bankWithdrawForm').classList.add('hidden');
+  el('bankStatus').textContent = '';
+});
+
+el('bankWithdrawSaveBtn').addEventListener('click', async () => {
+  const val = parseFloat(el('bankWithdrawInput').value);
+  const status = el('bankStatus');
+  status.classList.remove('ok');
+  if(isNaN(val) || val <= 0){
+    status.textContent = 'Escribe un monto v\u00e1lido para retirar.';
+    return;
+  }
+  const available = parseFloat(el('bankTotal').textContent.replace(/[^0-9.-]/g, '')) || 0;
+  if(val > available){
+    status.textContent = 'No puedes retirar m\u00e1s de lo que tienes en el bank (' + formatMoney(available) + ').';
+    return;
+  }
+  withdrawals.push({
+    id: (crypto.randomUUID ? crypto.randomUUID() : 'w' + Date.now() + Math.random().toString(16).slice(2)),
+    amount: val,
+    date: Date.now()
+  });
+  await saveWithdrawals();
+  el('bankWithdrawForm').classList.add('hidden');
+  renderScoreboard();
+  status.textContent = 'Retiraste ' + formatMoney(val) + '. Tu bank qued\u00f3 actualizado.';
+  status.classList.add('ok');
+});
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    oddsFormat = btn.dataset.format;
+    el('oddsInput').placeholder = oddsFormat === 'decimal' ? '1.75' : '-110';
+    el('oddsInput').step = oddsFormat === 'decimal' ? '0.01' : '1';
+    updatePreview();
+  });
+});
+
+el('eventList').addEventListener('input', e => {
+  if(e.target.classList.contains('event-input')) updateDescTitles();
+});
+
+el('stakeInput').addEventListener('input', updatePreview);
+el('oddsInput').addEventListener('input', updatePreview);
+el('addBetBtn').addEventListener('click', addBet);
+
+document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    renderHistory();
+  });
+});
+
+el('historyDateFilter').addEventListener('change', () => {
+  dateFilter = el('historyDateFilter').value;
+  renderHistory();
+});
+
+el('clearDateFilter').addEventListener('click', () => {
+  dateFilter = '';
+  el('historyDateFilter').value = '';
+  renderHistory();
+});
+
+init();
+</script>
+</body>
+</html>
